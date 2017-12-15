@@ -2,6 +2,7 @@ package message;
 
 import log.Log;
 import model.MessageModel;
+import model.UserModel;
 import util.Json;
 
 import java.util.*;
@@ -34,6 +35,14 @@ public class MessageProcs extends Thread{
             }
             if (message != null) {
                 Log.logD(message.getContent());
+                switch (message.getType()) {
+                    case LOGIN:
+                        if (message.getErrno() == 3000) {
+                            UserModel userModel = UserModel.getInstance();
+                            userModel.setUid(message.get("uid"));
+                        }
+                        break;
+                }
             }
         }
     }

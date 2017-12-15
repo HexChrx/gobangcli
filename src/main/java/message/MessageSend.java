@@ -1,18 +1,11 @@
 package message;
 
-import log.Log;
 import model.MessageModel;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.xml.XmlBeanFactory;
-import org.springframework.core.io.ClassPathResource;
-import socket.CommonSocket;
+import model.UserModel;
 import socket.Session;
 import socket.SessionCtrl;
 import util.Json;
 
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Scanner;
 
 public class MessageSend extends Thread{
@@ -45,6 +38,7 @@ public class MessageSend extends Thread{
             }
             if (messageModel != null) {
                 Session session = SessionCtrl.getInstence().getCommonSession();
+                System.out.println(Json.encode(messageModel));
                 session.sendData(Json.encode(messageModel));
             }
             try {
@@ -81,6 +75,11 @@ public class MessageSend extends Thread{
     }
 
     public MessageModel getSendDataInfo(Scanner scanner) {
+        UserModel userModel = UserModel.getInstance();
+        if ((userModel.getUid() != null) && userModel.getUid().equals("")) {
+            System.out.println("请先登录");
+            return null;
+        }
         System.out.println("请输入收件人id：");
         int uid = Integer.parseInt(scanner.nextLine());
         while(uid == 0) {
@@ -95,6 +94,7 @@ public class MessageSend extends Thread{
         }
         MessageModel messageModel = new MessageModel();
         messageModel.setType(2);
+        messageModel.getContent().put("from", "sss");
         messageModel.getContent().put("to", String.valueOf(uid));
         messageModel.getContent().put("message", message);
         return messageModel;

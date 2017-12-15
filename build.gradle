@@ -1,13 +1,12 @@
 group 'gobanecli.demo'
 version '1.0-SNAPSHOT'
 
-apply plugin: 'application'
+apply plugin: 'idea'
 apply plugin: 'java'
 
 sourceCompatibility = 1.8
 
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
@@ -40,4 +39,24 @@ dependencies {
 
 }
 
-mainClassName = 'main.Main'
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'main.Main'
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+//清除上次的编译过的文件
+task clearPj(type:Delete){
+    delete 'build','target'
+}
+task copyJar(type:Copy){
+    from configurations.runtime
+    into ('build/libs/lib')
+}
+//把JAR复制到目标目录
+task release(type: Copy,dependsOn: [build,copyJar]) {
+// from 'conf'
+// into ('build/libs/eachend/conf') // 目标位置
+}
